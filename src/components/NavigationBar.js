@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { AppBar, Button, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import { AccountCircleRounded, ExitToAppRounded, HomeRounded } from '@material-ui/icons'
 import { useStyles } from '../styles'
 import { useAuth } from '../AuthContext'
 
@@ -18,62 +19,36 @@ function NavigationBar() {
           </Typography>
           {currentUser ?
             <>
-              <Button color='inherit' component={Link} to='/'>
-                Home
-              </Button>
-              <Button color='inherit' component={Link} to='/me'>
-                My Profile
-              </Button>
-              <Button color='inherit'>
-                Logout
-              </Button>
-              {/* <Nav.Link as={Link} to='/'>Home</Nav.Link>
-              <Nav.Link as={Link} to='/me'>My profile</Nav.Link>
-              <Nav.Link>Logout</Nav.Link> */}
+              <Tooltip title='Home'>
+                <IconButton color='inherit' component={Link} to='/'>
+                  <HomeRounded />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title='Your Profile'>
+                <IconButton color='inherit' component={Link} to='/me'>
+                  <AccountCircleRounded />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title='Logout'>
+                <IconButton color='inherit'>
+                  <ExitToAppRounded />
+                </IconButton>
+              </Tooltip>
             </> :
             <>
-              <Button color='inherit' component={Link} to='/login'>
+              <Button color='inherit' component={Link} to='/login' className={classes.menuButton}>
                 Login
               </Button>
-              <Button color='inherit' component={Link} to='/signup'>
+              <Button color='inherit' component={Link} to='/signup' className={classes.menuButton}>
                 Signup
               </Button>
             </>
           }
-
         </Toolbar>
       </AppBar>
+      <div style={{ height: '100px' }}></div>
     </>
   )
-
-  // return (
-  //   <>
-  //     <Navbar collapseOnSelect
-  //       expand='lg' bg='dark' variant='dark'
-  //       fixed='top' className='shadow'>
-  //       <Container>
-  //         <Navbar.Brand>Social Network beta</Navbar.Brand>
-  //         <Navbar.Toggle aria-controls='responsive-navbar-nav' />
-  //         <Navbar.Collapse id='responsive-navbar-nav'>
-  //           <Nav className='ml-auto'>
-  //             {currentUser ?
-  //               <>
-  //                 <Nav.Link as={Link} to='/'>Home</Nav.Link>
-  //                 <Nav.Link as={Link} to='/me'>My profile</Nav.Link>
-  //                 <Nav.Link>Logout</Nav.Link>
-  //               </> :
-  //               <>
-  //                 <Nav.Link as={Link} to=''>Login</Nav.Link>
-  //                 <Nav.Link as={Link} to='signup'>Signup</Nav.Link>
-  //               </>
-  //             }
-  //           </Nav>
-  //         </Navbar.Collapse>
-  //       </Container>
-  //     </Navbar>
-  //     <div className='mb-5'><br /><br /></div>
-  //   </>
-  // )
 }
 
 export default NavigationBar
