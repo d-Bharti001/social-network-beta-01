@@ -11,6 +11,24 @@ export const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  horizontalLine: {
+    height: '1px',
+    border: '0px',
+    borderTop: '1px solid #ccc',
+    padding: '0px',
+    margin: theme.spacing(2),
+  },
+  cardLoginSignup: {
+    margin: theme.spacing(8, 'auto'),
+    padding: theme.spacing(2),
+    borderRadius: theme.spacing(1),
+  },
+  form: {
+    margin: theme.spacing(4, 2),
+  },
+  submitButton: {
+    margin: theme.spacing(2, 'auto', 4),
+  }
 }))
 
 export function CustomThemeProvider({ children }) {
