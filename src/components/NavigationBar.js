@@ -8,7 +8,17 @@ import { useAuth } from '../AuthContext'
 function NavigationBar() {
 
   const classes = useStyles()
-  const { currentUser } = useAuth()
+  const { currentUser, logout } = useAuth()
+
+  const doLogout = async (event) => {
+    event.preventDefault()
+    try {
+      await logout()
+    }
+    catch {
+      console.log('Couldn\'t logout. Try again')
+    }
+  }
 
   return (
     <>
@@ -25,12 +35,12 @@ function NavigationBar() {
                 </IconButton>
               </Tooltip>
               <Tooltip title='Your Profile'>
-                <IconButton color='inherit' component={Link} to='/me'>
+                <IconButton color='inherit' component={Link} to={`/user/${currentUser.uid}`}>
                   <AccountCircleRounded />
                 </IconButton>
               </Tooltip>
               <Tooltip title='Logout'>
-                <IconButton color='inherit'>
+                <IconButton color='inherit' onClick={doLogout}>
                   <ExitToAppRounded />
                 </IconButton>
               </Tooltip>
