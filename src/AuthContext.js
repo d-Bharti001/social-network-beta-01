@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { auth } from './firebase'
+import { auth, db } from './firebase'
 import { LinearProgress } from '@material-ui/core'
 
 const AuthContext = createContext()
@@ -12,6 +12,8 @@ export function AuthProvider({ children }) {
 
   const [currentUser, setCurrentUser] = useState()
   const [loaded, setLoaded] = useState(false)
+  const [currentUserData, setCurrentUserData] = useState()
+  const [currentUserDataLoading, setCurrentUserDataLoading] = useState(false)
 
   const signup = (email, password) => {
     return auth.createUserWithEmailAndPassword(email, password)
@@ -29,6 +31,22 @@ export function AuthProvider({ children }) {
     return auth.sendPasswordResetEmail(email)
   }
 
+  const loadCurrentUserData = async () => {
+    if (currentUser) {
+      setCurrentUserDataLoading(true)
+      try {
+        let doc = await db.collection('users').doc(currentUser.uid).get()
+        setCurrentUserData(doc.data())
+      }
+      catch (err) {
+        console.log(err)
+      }
+      finally {
+        setCurrentUserDataLoading(false)
+      }
+    }
+  }
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       setCurrentUser(user)
@@ -38,13 +56,20 @@ export function AuthProvider({ children }) {
     return unsubscribe
   }, [])
 
+  useEffect(() => {
+    loadCurrentUserData()
+  }, [currentUser])
+
   return (
     <AuthContext.Provider value={{
       currentUser,
+      currentUserData,
+      currentUserDataLoading,
       signup,
       login,
       logout,
-      resetPassword
+      resetPassword,
+      loadCurrentUserData,
     }}>
       {loaded ?
         children :

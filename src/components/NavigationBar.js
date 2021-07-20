@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { AppBar, Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import { AccountCircleRounded, ExitToAppRounded, HomeRounded } from '@material-ui/icons'
 import { useStyles } from '../styles'
 import { useAuth } from '../AuthContext'
@@ -8,7 +8,7 @@ import { useAuth } from '../AuthContext'
 function NavigationBar() {
 
   const classes = useStyles()
-  const { currentUser, logout } = useAuth()
+  const { currentUser, currentUserDataLoading, logout } = useAuth()
 
   const doLogout = async (event) => {
     event.preventDefault()
@@ -55,6 +55,7 @@ function NavigationBar() {
             </>
           }
         </Toolbar>
+        {currentUserDataLoading && <LinearProgress color='secondary' />}
       </AppBar>
       <div style={{ height: '100px' }}></div>
     </>

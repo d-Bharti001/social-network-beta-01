@@ -28,7 +28,10 @@ export const useStyles = makeStyles((theme) => ({
   },
   submitButton: {
     margin: theme.spacing(2, 'auto', 4),
-  }
+  },
+  datePicker: {
+    width: '100%',
+  },
 }))
 
 export function CustomThemeProvider({ children }) {

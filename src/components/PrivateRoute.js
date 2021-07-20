@@ -1,10 +1,11 @@
 import React from 'react'
 import { Route, Redirect } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
+import FillDetailsForm from './FillDetailsForm'
 
 function PrivateRoute({ component: Component, ...rest }) {
 
-  const { currentUser } = useAuth()
+  const { currentUser, currentUserData, currentUserDataLoading } = useAuth()
 
   return (
     <Route
@@ -12,7 +13,11 @@ function PrivateRoute({ component: Component, ...rest }) {
       render={props => {
         return (
           currentUser ?
-            <Component {...props} /> :
+            currentUserDataLoading ?
+              <></> :
+              currentUserData ?
+                <Component {...props} /> :
+                <FillDetailsForm {...props} /> :
             <Redirect to={{
               pathname: '/login',
               state: { from: props.location }
