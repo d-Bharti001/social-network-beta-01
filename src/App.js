@@ -15,9 +15,9 @@ import PasswordResetPage from './components/PasswordResetPage'
 function App() {
   return (
     <div className='App'>
+      <CssBaseline />
       <CustomThemeProvider>
         <AuthProvider>
-          <CssBaseline />
           <Router>
             <NavigationBar />
             <Switch>

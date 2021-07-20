@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { auth } from './firebase'
+import { LinearProgress } from '@material-ui/core'
 
 const AuthContext = createContext()
 
 export function useAuth() {
-  return useContext(AuthContext);
+  return useContext(AuthContext)
 }
 
 export function AuthProvider({ children }) {
@@ -13,28 +14,28 @@ export function AuthProvider({ children }) {
   const [loaded, setLoaded] = useState(false)
 
   const signup = (email, password) => {
-    return auth.createUserWithEmailAndPassword(email, password);
+    return auth.createUserWithEmailAndPassword(email, password)
   }
 
   const login = (email, password) => {
-    return auth.signInWithEmailAndPassword(email, password);
+    return auth.signInWithEmailAndPassword(email, password)
   }
 
   const logout = () => {
-    return auth.signOut();
+    return auth.signOut()
   }
 
   const resetPassword = (email) => {
-    return auth.sendPasswordResetEmail(email);
+    return auth.sendPasswordResetEmail(email)
   }
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
-      setCurrentUser(user);
-      setLoaded(true);
+      setCurrentUser(user)
+      setLoaded(true)
     })
 
-    return unsubscribe;
+    return unsubscribe
   }, [])
 
   return (
@@ -45,7 +46,10 @@ export function AuthProvider({ children }) {
       logout,
       resetPassword
     }}>
-      {loaded && children}
+      {loaded ?
+        children :
+        <LinearProgress color='secondary' />
+      }
     </AuthContext.Provider>
   )
 }
