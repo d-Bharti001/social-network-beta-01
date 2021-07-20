@@ -47,7 +47,7 @@ function FillDetailsForm() {
 
   return (
     <div className='FillDetailsForm'>
-      <Container maxWidth='md'>
+      <Container maxWidth='sm'>
         <Card elevation={2} className={classes.cardLoginSignup}>
           <CardContent>
             <Typography variant='h2' align='center' gutterBottom>

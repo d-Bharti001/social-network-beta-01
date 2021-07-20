@@ -32,7 +32,7 @@ export const useStyles = makeStyles((theme) => ({
   datePicker: {
     width: '100%',
   },
-}))
+}), { index: 1 })
 
 export function CustomThemeProvider({ children }) {
 
