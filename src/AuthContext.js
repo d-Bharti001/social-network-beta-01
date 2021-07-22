@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
 
   const [currentUser, setCurrentUser] = useState()
   const [loaded, setLoaded] = useState(false)
-  const [currentUserData, setCurrentUserData] = useState()
+  const [currentUserDataExists, setCurrentUserDataExists] = useState(false)
   const [currentUserDataLoading, setCurrentUserDataLoading] = useState(false)
 
   const signup = (email, password) => {
@@ -31,18 +31,14 @@ export function AuthProvider({ children }) {
     return auth.sendPasswordResetEmail(email)
   }
 
-  const loadCurrentUserData = async () => {
+  const checkCurrentUserData = async () => {
     if (currentUser) {
-      setCurrentUserDataLoading(true)
       try {
         let doc = await db.collection('users').doc(currentUser.uid).get()
-        setCurrentUserData(doc.data())
+        setCurrentUserDataExists(doc.exists)
       }
       catch (err) {
-        console.log(err)
-      }
-      finally {
-        setCurrentUserDataLoading(false)
+        throw err
       }
     }
   }
@@ -57,19 +53,37 @@ export function AuthProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    loadCurrentUserData()
-  }, [currentUser])
+    async function fetchData() {
+      setCurrentUserDataLoading(true)
+      try {
+        await checkCurrentUserData()
+      }
+      catch (err) {
+        console.log('Error fetching current user data from database:')
+        console.log(err)
+      }
+      finally {
+        setCurrentUserDataLoading(false)
+      }
+    }
+    if(currentUser) {
+      console.log("fetching current user data")
+      fetchData()
+    }
+  }, // eslint-disable-next-line
+    [currentUser]
+  )
 
   return (
     <AuthContext.Provider value={{
       currentUser,
-      currentUserData,
+      currentUserDataExists,
       currentUserDataLoading,
       signup,
       login,
       logout,
       resetPassword,
-      loadCurrentUserData,
+      checkCurrentUserData,
     }}>
       {loaded ?
         children :

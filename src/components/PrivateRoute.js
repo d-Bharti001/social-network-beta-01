@@ -5,7 +5,7 @@ import FillDetailsForm from './FillDetailsForm'
 
 function PrivateRoute({ component: Component, ...rest }) {
 
-  const { currentUser, currentUserData, currentUserDataLoading } = useAuth()
+  const { currentUser, currentUserDataExists, currentUserDataLoading } = useAuth()
 
   return (
     <Route
@@ -15,7 +15,7 @@ function PrivateRoute({ component: Component, ...rest }) {
           currentUser ?
             currentUserDataLoading ?
               <></> :
-              currentUserData ?
+              currentUserDataExists ?
                 <Component {...props} /> :
                 <FillDetailsForm {...props} /> :
             <Redirect to={{
