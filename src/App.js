@@ -1,8 +1,9 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { CssBaseline } from '@material-ui/core'
-import { CustomThemeProvider } from './styles.js'
+import { CustomThemeProvider } from './styles'
 import { AuthProvider } from './AuthContext'
+import { DatabaseProvider } from './DatabaseContext'
 import PrivateRoute from './components/PrivateRoute'
 import NavigationBar from './components/NavigationBar'
 import HomePage from './components/HomePage'
@@ -18,17 +19,19 @@ function App() {
       <CssBaseline />
       <CustomThemeProvider>
         <AuthProvider>
-          <Router>
-            <NavigationBar />
-            <Switch>
-              <PrivateRoute exact path='/' component={HomePage} />
-              <PrivateRoute path='/user/:id' component={UserPage} />
-              <PrivateRoute path='/post/:id' component={PostPage} />
-              <Route path='/login' component={LoginPage} />
-              <Route path='/signup' component={SignupPage} />
-              <Route path='/reset-password' component={PasswordResetPage} />
-            </Switch>
-          </Router>
+          <DatabaseProvider>
+            <Router>
+              <NavigationBar />
+              <Switch>
+                <PrivateRoute exact path='/' component={HomePage} />
+                <PrivateRoute path='/user/:id' component={UserPage} />
+                <PrivateRoute path='/post/:id' component={PostPage} />
+                <Route path='/login' component={LoginPage} />
+                <Route path='/signup' component={SignupPage} />
+                <Route path='/reset-password' component={PasswordResetPage} />
+              </Switch>
+            </Router>
+          </DatabaseProvider>
         </AuthProvider>
       </CustomThemeProvider>
     </div>
