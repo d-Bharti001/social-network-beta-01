@@ -384,50 +384,6 @@ export function DatabaseProvider({ children }) {
         await loadProfile(currentUser.uid)
         // Load initial posts
         await loadPosts()
-
-        // Share post - DONE
-        // console.log('sharing post')
-        // sharePost('UT4tZ41zAw4q9WDY0jAy')
-
-        // View post - DONE
-        // console.log('Setting view for post')
-        // viewPost('MZnSou7jDDt5fPywSiQl')
-
-        // Flag post (and un-flag by calling again) - DONE
-        // console.log('Flagging post')
-        // toggleFlagPost('MZnSou7jDDt5fPywSiQl')
-
-        /* --- abc@123.com --- */
-        // Share post - DONE
-        // console.log('sharing post 2(that is a shared post)')
-        // sharePost('MZnSou7jDDt5fPywSiQl')
-
-        // View post - DONE
-        // console.log('viewing own post - but original author is different')
-        // viewPost('rEHyQQjB8BlR6Qdrge2m')
-
-        // Flag post 2 - DONE
-        // console.log('Flagging post')
-        // toggleFlagPost('MZnSou7jDDt5fPywSiQl')
-
-        // Flag post 3 - DONE
-        // console.log('(Un-)flagging post')
-        // toggleFlagPost('rEHyQQjB8BlR6Qdrge2m')
-
-        // Flag original post - DONE
-        // console.log('Flagging org. post')
-        // toggleFlagPost('UT4tZ41zAw4q9WDY0jAy')
-
-        // Comment on post - DONE
-        // console.log('Commenting')
-        // commentPost('MZnSou7jDDt5fPywSiQl','The first comment on post 2')
-
-        // Load comments - DONE
-        // loadPostComments('MZnSou7jDDt5fPywSiQl')
-
-        // Share post - after adding newPostId field - DONE
-        // console.log('Sharing post')
-        // sharePost('rEHyQQjB8BlR6Qdrge2m')
       }
       catch (err) {
         console.log('Error from useEffect of DatabaseContext')
