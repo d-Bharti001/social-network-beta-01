@@ -374,7 +374,7 @@ export function DatabaseProvider({ children }) {
     }
 
     console.log('Trying to load')
-    if (currentUser && currentUserDataExists) {
+    if (currentUserDataExists) {
       console.log('Loading initials...')
 
       // Load the required initials
@@ -389,7 +389,7 @@ export function DatabaseProvider({ children }) {
       setLastPost()
       setNoMorePosts(false)
     }
-  }, [currentUser, currentUserDataExists])
+  }, [currentUserDataExists])
 
   return (
     <DatabaseContext.Provider value={{
