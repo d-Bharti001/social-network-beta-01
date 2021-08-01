@@ -289,7 +289,7 @@ export function DatabaseProvider({ children }) {
       var docData = postData || (await postRef.get()).data()
 
       // IMPORTANT: Load original post first before loading current post data
-      if (docData.type === 'shared')
+      if (docData.type === 'shared' && !posts[docData.orgPostId])
         await loadPost(docData.orgPostId)
 
       else if (docData.type === 'original')
