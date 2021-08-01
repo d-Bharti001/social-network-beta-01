@@ -20,7 +20,12 @@ export function DatabaseProvider({ children }) {
 
   const updateProfileDetails = async (userId, userDetails) => {
     try {
-      await db.collection('users').doc(userId).update(userDetails)
+      var ref = db.collection('users').doc(userId)
+      var { exists } = await ref.get()
+      if (exists)
+        await ref.update(userDetails)
+      else
+        await ref.set(userDetails)
     }
     catch (err) {
       console.log('Error uploading user details to firestore')

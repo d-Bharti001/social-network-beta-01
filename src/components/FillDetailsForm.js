@@ -1,45 +1,60 @@
-import 'date-fns'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button, Card, CardContent, Container, MenuItem, TextField, Typography } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
-import DateFnsUtils from '@date-io/date-fns'
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
 import { useStyles } from '../styles'
 import { useAuth } from '../AuthContext'
+import { useDatabase } from '../DatabaseContext'
 
 function FillDetailsForm() {
 
   const classes = useStyles()
-  const { currentUser } = useAuth()
+  const { currentUser, checkCurrentUserData } = useAuth()
+  const { updateProfileDetails } = useDatabase()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const name = useRef(null)
   const bio = useRef(null)
   const [gender, setGender] = useState('')
-  const [dob, setDob] = useState(new Date('1999-03-30'))
+  const [birthYear, setBirthYear] = useState('')
+  const [yearList, setYearList] = useState([])
+
+  useEffect(() => {
+    var currentYear = new Date().getFullYear()
+    var list = []
+    for (var y = currentYear - 10; y >= 1950; y--)
+      list.push(String(y))
+    setYearList(list)
+  }, [])
 
   const handleGenderChange = (event) => {
     setGender(event.target.value)
   }
 
-  const handleDateChange = (date) => {
-    setDob(date)
+  const handleBirthYearChange = (event) => {
+    setBirthYear(event.target.value)
   }
 
   const doFillDetails = async (event) => {
     event.preventDefault()
-    // setLoading(true)
-    // setError('')
+    setLoading(true)
+    setError('')
+
     try {
-      // TODO:
-      // await upload to firestore - preferably using useProfiles()
-      // then call useAuth()'s loadCurrentUserData()
-      // then the component will be unmounted due to the logic in PrivateRoute.js
-      // so don't do any state updates here
+      var userDetails = {
+        email: currentUser.email,
+        name: name.current.value,
+        bio: bio.current.value,
+        gender: gender,
+        birthYear: Number(birthYear)
+      }
+
+      // Upload profile details to database
+      await updateProfileDetails(currentUser.uid, userDetails)
+
+      await checkCurrentUserData()
     }
     catch (err) {
-      console.log('Error')
-      console.log(err)
+      console.log('Error:', err.name, err.message)
       setError('Some error occurred. Please try again.')
       setLoading(false)
     }
@@ -97,26 +112,20 @@ function FillDetailsForm() {
                 <MenuItem value='Mr.'>Mr.</MenuItem>
                 <MenuItem value='Ms.'>Ms.</MenuItem>
               </TextField>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <KeyboardDatePicker
-                  disableToolbar
-                  required
-                  variant='inline'
-                  format='dd/MM/yyyy'
-                  margin='normal'
-                  id='dob'
-                  label='Date of birth (DD/MM/YYYY)'
-                  value={dob}
-                  maxDate='2020-03-01'
-                  onChange={handleDateChange}
-                  KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                  }}
-                  className={classes.datePicker}
-                />
-              </MuiPickersUtilsProvider>
+              <TextField
+                margin='normal'
+                select
+                required
+                fullWidth
+                id='birth-year'
+                label='Birth year'
+                value={birthYear}
+                onChange={handleBirthYearChange}
+              >
+                {yearList.map((year, key) => <MenuItem value={year} key={key}>{year}</MenuItem>)}
+              </TextField>
               {error &&
-                <Alert variant='outlined' severity='error' style={{marginTop: '16px'}}>
+                <Alert variant='outlined' severity='error' style={{ marginTop: '16px' }}>
                   {error}
                 </Alert>
               }
