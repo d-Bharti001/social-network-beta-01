@@ -10,7 +10,7 @@ export function useDatabase() {
 
 export function DatabaseProvider({ children }) {
 
-  const { currentUser } = useAuth()
+  const { currentUser, currentUserDataExists } = useAuth()
   const [posts, setPosts] = useState({})
   const [postComments, setPostComments] = useState({})
   const [profiles, setProfiles] = useState({})
@@ -75,9 +75,9 @@ export function DatabaseProvider({ children }) {
     newPostObj[newPostData.postId] = {
       ...newPostData,
       createdAt: new Date(newPostData.createdAt.seconds * 1000),
-      views: 0,
-      flags: 0,
-      shares: 0
+      viewers: new Set(),
+      flaggers: new Set(),
+      sharers: new Set()
     }
     setPosts(Object.assign(posts, newPostObj))
   }
@@ -132,25 +132,11 @@ export function DatabaseProvider({ children }) {
       throw new Error('Couldn\'t add share event')
     }
 
-    try {
-      // Get the updated list of share events of original post by current user
-      var { docs } = await db.collection('posts').doc(orgPostId).collection('events')
-        .where('type', '==', 'shared').where('sharer', '==', currentUser.uid).get()
-    }
-    catch (err) {
-      console.log('Error fetching share count')
-      throw new Error('Couldn\'t fetch share events')
-    }
-
-    // Update share counts of original post in posts state variable
-    if (docs.length === 1) {
-      // If the length is 1, that means this user has shared this post for the first time
-      // so increment the share count
-      var postObj = {}
-      postObj[orgPostId] = Object.assign({}, posts[orgPostId])
-      postObj[orgPostId].shares += 1
-      setPosts(Object.assign(posts, postObj))
-    }
+    // Update sharers set of original post in the posts state variable
+    var postObj = {}
+    postObj[orgPostId] = Object.assign({}, posts[orgPostId])
+    postObj[orgPostId].sharers.add(currentUser.uid)
+    setPosts(Object.assign(posts, postObj))
   }
 
   const viewPost = async (postId) => {
@@ -185,10 +171,10 @@ export function DatabaseProvider({ children }) {
       throw err
     }
 
-    // Increment view count of original post in posts state variable
+    // Update viewers set of original post in the posts state variable
     var postObj = {}
     postObj[orgPostId] = Object.assign({}, posts[orgPostId])
-    postObj[orgPostId].views += 1
+    postObj[orgPostId].viewers.add(currentUser.uid)
     setPosts(Object.assign(posts, postObj))
   }
 
@@ -203,7 +189,7 @@ export function DatabaseProvider({ children }) {
       // Get the list of flags of original post by current user
       var { docs } = await eventsRef.where('type', '==', 'flagged').where('flagger', '==', currentUser.uid).get()
 
-      var inc
+      var action
 
       if (docs.length > 0) {  // User had flagged the post earlier
         // Delete flag events by current user from firestore
@@ -211,7 +197,7 @@ export function DatabaseProvider({ children }) {
           await eventsRef.doc(docs[i].id).delete()
         }
 
-        inc = -1
+        action = 'delete'
       }
       else {
         // Add a flag event to firestore
@@ -223,7 +209,7 @@ export function DatabaseProvider({ children }) {
           timestamp: Timestamp.now()
         })
 
-        inc = 1
+        action = 'add'
       }
     }
     catch (err) {
@@ -231,12 +217,11 @@ export function DatabaseProvider({ children }) {
       throw err
     }
 
-    // Increment/decrement flag count of original post in posts state variable
+    // Update flaggers set of original post in the posts state variable
     var postObj = {}
     postObj[orgPostId] = Object.assign({}, posts[orgPostId])
-    postObj[orgPostId].flags += inc
-    if (inc === 1) postObj[orgPostId].flaggedByCurrentUser = true
-    else if (inc === -1) postObj[orgPostId].flaggedByCurrentUser = false
+    if (action === 'add') postObj[orgPostId].flaggers.add(currentUser.uid)
+    else if (action === 'delete') postObj[orgPostId].flaggers.delete(currentUser.uid)
     setPosts(Object.assign(posts, postObj))
   }
 
@@ -332,20 +317,9 @@ export function DatabaseProvider({ children }) {
     }
 
     if (docData.type === 'original') {
-
-      // Set number of views
-      newPostObj[postId].views = events.filter(a => a.data().type === 'viewed').length
-
-      // Set number of flags
-      newPostObj[postId].flags = events.filter(a => a.data().type === 'flagged').length
-
-      // Set whether the post is flagged by current user
-      newPostObj[postId].flaggedByCurrentUser = events.filter(a => a.data().type === 'flagged')
-        .filter(a => a.data().flagger === currentUser.uid)
-        .length ? true : false
-
-      // Set number of shares
-      newPostObj[postId].shares = new Set(events.filter(a => a.data().type === 'shared').map(a => a.data().sharer)).size
+      newPostObj[postId].viewers = new Set(events.filter(a => a.data().type === 'viewed').map(a => a.data().viewer))
+      newPostObj[postId].flaggers = new Set(events.filter(a => a.data().type === 'flagged').map(a => a.data().flagger))
+      newPostObj[postId].sharers = new Set(events.filter(a => a.data().type === 'shared').map(a => a.data().sharer))
     }
 
     // Add to the posts state variable
@@ -379,6 +353,7 @@ export function DatabaseProvider({ children }) {
 
   useEffect(() => {
     const loadInitials = async () => {
+      setLoadingInitials(true)
       try {
         // Load profile details of current user
         await loadProfile(currentUser.uid)
@@ -393,8 +368,23 @@ export function DatabaseProvider({ children }) {
       setLoadingInitials(false)
     }
 
-    loadInitials()
-  }, [])
+    console.log('Trying to load')
+    if (currentUser && currentUserDataExists) {
+      console.log('Loading initials...')
+
+      // Load the required initials
+      loadInitials()
+    }
+    else {
+      // Reset the state variables
+      setPosts({})
+      setPostComments({})
+      setProfiles({})
+      setLoadingInitials(true)
+      setLastPost()
+      setNoMorePosts(false)
+    }
+  }, [currentUser, currentUserDataExists])
 
   return (
     <DatabaseContext.Provider value={{

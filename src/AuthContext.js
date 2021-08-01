@@ -66,9 +66,13 @@ export function AuthProvider({ children }) {
         setCurrentUserDataLoading(false)
       }
     }
+
     if(currentUser) {
       console.log("fetching current user data")
       fetchData()
+    }
+    else {
+      setCurrentUserDataExists(false)
     }
   }, // eslint-disable-next-line
     [currentUser]
