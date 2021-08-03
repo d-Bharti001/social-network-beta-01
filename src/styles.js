@@ -32,6 +32,16 @@ export const useStyles = makeStyles((theme) => ({
   datePicker: {
     width: '100%',
   },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+  snackbar: {
+    [theme.breakpoints.down('xs')]: {
+      bottom: 90,
+    },
+  },
 }), { index: 1 })
 
 export function CustomThemeProvider({ children }) {
