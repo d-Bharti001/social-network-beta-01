@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { db, Timestamp } from './firebase'
 import { useAuth } from './AuthContext'
 
@@ -15,8 +15,9 @@ export function DatabaseProvider({ children }) {
   const [postComments, setPostComments] = useState({})
   const [profiles, setProfiles] = useState({})
   const [loadingInitials, setLoadingInitials] = useState(true)
-  const [lastPost, setLastPost] = useState()
-  const [noMorePosts, setNoMorePosts] = useState(false)
+  const lastPost = useRef()
+  const noMorePosts = useRef(false)
+  const loadingMorePosts = useRef(false)
 
   const updateProfileDetails = async (userId, userDetails) => {
     try {
@@ -38,7 +39,7 @@ export function DatabaseProvider({ children }) {
     Object.assign(profileData, userDetails)
     var profileObj = {}
     profileObj[userId] = profileData
-    setProfiles(Object.assign(profiles, profileObj))
+    setProfiles(prevProfiles => ({ ...prevProfiles, ...profileObj }))
   }
 
   const loadProfile = async (userId) => {
@@ -52,7 +53,7 @@ export function DatabaseProvider({ children }) {
 
     var newUserObj = {}
     newUserObj[userId] = userData
-    setProfiles(Object.assign(profiles, newUserObj))
+    setProfiles(prevProfiles => ({ ...prevProfiles, ...newUserObj }))
   }
 
   const createPost = async (postContent) => {
@@ -84,7 +85,7 @@ export function DatabaseProvider({ children }) {
       flaggers: new Set(),
       sharers: new Set()
     }
-    setPosts(Object.assign(posts, newPostObj))
+    setPosts(prevPosts => ({ ...prevPosts, ...newPostObj }))
   }
 
   const sharePost = async (postId) => {
@@ -118,7 +119,7 @@ export function DatabaseProvider({ children }) {
       ...newPostData,
       createdAt: new Date(newPostData.createdAt.seconds * 1000)
     }
-    setPosts(Object.assign(posts, newPostObj))
+    setPosts(prevPosts => ({ ...prevPosts, ...newPostObj }))
 
     try {
       // Add a 'shared' event to the original post
@@ -141,7 +142,7 @@ export function DatabaseProvider({ children }) {
     var postObj = {}
     postObj[orgPostId] = Object.assign({}, posts[orgPostId])
     postObj[orgPostId].sharers.add(currentUser.uid)
-    setPosts(Object.assign(posts, postObj))
+    setPosts(prevPosts => ({ ...prevPosts, ...postObj }))
   }
 
   const viewPost = async (postId) => {
@@ -180,7 +181,7 @@ export function DatabaseProvider({ children }) {
     var postObj = {}
     postObj[orgPostId] = Object.assign({}, posts[orgPostId])
     postObj[orgPostId].viewers.add(currentUser.uid)
-    setPosts(Object.assign(posts, postObj))
+    setPosts(prevPosts => ({ ...prevPosts, ...postObj }))
   }
 
   const toggleFlagPost = async (postId) => {
@@ -227,7 +228,7 @@ export function DatabaseProvider({ children }) {
     postObj[orgPostId] = Object.assign({}, posts[orgPostId])
     if (action === 'add') postObj[orgPostId].flaggers.add(currentUser.uid)
     else if (action === 'delete') postObj[orgPostId].flaggers.delete(currentUser.uid)
-    setPosts(Object.assign(posts, postObj))
+    setPosts(prevPosts => ({ ...prevPosts, ...postObj }))
   }
 
   const commentPost = async (postId, comment) => {
@@ -250,7 +251,7 @@ export function DatabaseProvider({ children }) {
     var newCommObj = {}
     newCommObj[postId] = postComments[postId] ? [].push(postComments[postId]) : []
     newCommObj[postId].unshift(newComment)  // Add to the beginning of the list
-    setPostComments(Object.assign(postComments, newCommObj))
+    setPostComments(prevPostComments => ({ ...prevPostComments, ...newCommObj }))
   }
 
   const loadPostComments = async (postId) => {
@@ -285,7 +286,7 @@ export function DatabaseProvider({ children }) {
     }
     var newCommObj = {}
     newCommObj[postId] = commentsList
-    setPostComments(Object.assign(postComments, newCommObj))
+    setPostComments(prevPostComments => ({ ...prevPostComments, ...newCommObj }))
   }
 
   const loadPost = async (postId, postData) => {
@@ -328,17 +329,27 @@ export function DatabaseProvider({ children }) {
     }
 
     // Add to the posts state variable
-    setPosts(Object.assign(posts, newPostObj))
+    setPosts(prevPosts => ({ ...prevPosts, ...newPostObj }))
   }
 
   const loadPosts = async () => {
-    if (noMorePosts)
+    if (loadingMorePosts.current === true) {
+      console.log('currently loading posts. can\'t load more')
       return
+    }
+    if (noMorePosts.current === true) {
+      console.log('No more posts')
+      return
+    }
 
     try {
+      console.log('Loading more posts')
+
+      loadingMorePosts.current = true
+
       var { docs } = await db.collection('posts')
         .orderBy('createdAt', 'desc')
-        .startAfter(lastPost || '')
+        .startAfter(lastPost.current || '')
         .limit(6)
         .get()
 
@@ -346,13 +357,17 @@ export function DatabaseProvider({ children }) {
         if (!posts[docs[i].id])
           await loadPost(docs[i].id, docs[i].data())
       }
-      setLastPost(docs[docs.length - 1])
+
+      lastPost.current = docs[docs.length - 1]
       if (docs.length === 0)
-        setNoMorePosts(true)
+        noMorePosts.current = true
     }
     catch (err) {
       console.log('Couldn\'t load posts')
       throw err
+    }
+    finally {
+      loadingMorePosts.current = false
     }
   }
 
@@ -386,8 +401,9 @@ export function DatabaseProvider({ children }) {
       setPostComments({})
       setProfiles({})
       setLoadingInitials(true)
-      setLastPost()
-      setNoMorePosts(false)
+      lastPost.current = undefined
+      noMorePosts.current = false
+      loadingMorePosts.current = false
     }
   }, [currentUserDataExists])
 
@@ -397,8 +413,6 @@ export function DatabaseProvider({ children }) {
       postComments,
       profiles,
       loadingInitials,
-      lastPost,
-      noMorePosts,
       updateProfileDetails,
       loadProfile,
       createPost,
