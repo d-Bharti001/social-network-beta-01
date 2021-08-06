@@ -1,10 +1,11 @@
 import React from 'react'
+import PostsList from './PostsList'
 import PostCreateForm from './PostCreateForm'
 
 function HomePage() {
   return (
     <div className='HomePage'>
-      <h2>Home Page</h2>
+      <PostsList />
       <PostCreateForm />
     </div>
   )

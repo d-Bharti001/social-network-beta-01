@@ -23,6 +23,19 @@ export const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderRadius: theme.spacing(1),
   },
+  postCard: {
+    margin: theme.spacing(3, 'auto'),
+  },
+  postContent: {
+    whiteSpace: 'pre-wrap',
+  },
+  readMore: {
+    textDecoration: 'underline',
+    cursor: 'pointer',
+  },
+  postCardIcon: {
+    marginRight: theme.spacing(1),
+  },
   form: {
     margin: theme.spacing(4, 2),
   },
@@ -33,7 +46,7 @@ export const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
   fab: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: theme.spacing(2),
     right: theme.spacing(2),
   },
