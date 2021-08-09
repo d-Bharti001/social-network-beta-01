@@ -10,6 +10,10 @@ function PostsList() {
   const { loadingInitials, posts, loadPosts } = useDatabase()
 
   const handleScroll = () => {
+    // Prevent unintentional function calling during page transitions
+    if (document.documentElement.offsetHeight < window.innerHeight)
+      return
+
     // Trigger function when user reaches 180 pixels from the bottom of the page
     if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 180) {
       loadPosts()
@@ -23,7 +27,7 @@ function PostsList() {
   }, [])
 
   return (
-    <div className='PostsList' style={{marginBottom: '40px'}}>
+    <div className='PostsList' style={{ marginBottom: '40px' }}>
       <Container maxWidth='xs'>
         {loadingInitials ?
           <div style={{ textAlign: 'center' }}>
