@@ -248,13 +248,14 @@ export function DatabaseProvider({ children }) {
     }
 
     // Add new comment to the postComments state variable
-    var newCommObj = {}
-    newCommObj[postId] = postComments[postId] ? [].push(postComments[postId]) : []
-    // Add new comment object to the beginning of the list
-    newCommObj[postId].unshift({
+    var newPostComment = {
       ...newComment,
       timestamp: new Date(newComment.timestamp.seconds * 1000)
-    })
+    }
+    var newCommObj = {}
+    newCommObj[postId] = postComments[postId] ?
+      [newPostComment, ...postComments[postId]] :
+      [newPostComment]
     setPostComments(prevPostComments => ({ ...prevPostComments, ...newCommObj }))
   }
 

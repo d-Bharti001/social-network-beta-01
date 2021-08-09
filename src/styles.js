@@ -26,8 +26,11 @@ export const useStyles = makeStyles((theme) => ({
   postCard: {
     margin: theme.spacing(3, 'auto'),
   },
-  postContent: {
+  paragraph: {
     whiteSpace: 'pre-wrap',
+  },
+  avatar: {
+    borderRadius: theme.spacing(1),
   },
   readMore: {
     textDecoration: 'underline',

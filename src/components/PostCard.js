@@ -6,13 +6,14 @@ import {
 } from '@material-ui/core'
 import {
   MoreVert, FlagRounded, OutlinedFlagRounded, ShareOutlined,
-  Refresh, OpenInNew, VisibilityOutlined
+  MessageOutlined, Refresh, OpenInNew, VisibilityOutlined
 } from '@material-ui/icons'
 import { blue, red } from '@material-ui/core/colors'
 import Identicon from 'identicon.js'
 import { useStyles } from '../styles'
 import { useDatabase } from '../DatabaseContext'
 import PostSharer from './PostSharer'
+import Comments from './Comments'
 
 function PostCard({ postId, myUid }) {
 
@@ -32,6 +33,7 @@ function PostCard({ postId, myUid }) {
 
   const [expanded, setExpanded] = useState(false)
   const [hasRead, setHasRead] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleFlag = () => {
@@ -58,6 +60,10 @@ function PostCard({ postId, myUid }) {
     setExpanded(false)
   }
 
+  const handleCommentsOpen = () => {
+    setCommentsOpen(!commentsOpen)
+  }
+
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
   }
@@ -82,7 +88,7 @@ function PostCard({ postId, myUid }) {
 
         <CardHeader
           avatar={
-            <img alt='account-avatar' style={{ borderRadius: '4px' }}
+            <img alt='account-avatar' className={classes.avatar}
               src={`data:image/png;base64,${new Identicon(thisPost.creator, 30).toString()}`}
             />
           }
@@ -135,7 +141,7 @@ function PostCard({ postId, myUid }) {
             </Typography>
           }
 
-          <Typography variant='body2' className={classes.postContent}>
+          <Typography variant='body2' className={classes.paragraph}>
             {expanded ?
               <>
                 {content + ' '}
@@ -191,7 +197,7 @@ function PostCard({ postId, myUid }) {
             </Grid>
 
             <Grid container item xs={12} style={{ borderTop: '1px solid #ccc' }}>
-              <Grid item xs={6}>
+              <Grid item xs>
                 <Button onClick={handleFlag} fullWidth size='small' style={{ textTransform: 'none' }}>
                   {flaggedByMe ?
                     <>
@@ -205,10 +211,20 @@ function PostCard({ postId, myUid }) {
                   }
                 </Button>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs>
+                <Button onClick={handleCommentsOpen} fullWidth size='small' style={{ textTransform: 'none' }}>
+                  <MessageOutlined fontSize='small' style={{ color: blue[700] }} className={classes.postCardIcon} />
+                  <Typography variant='subtitle2'>Comment</Typography>
+                </Button>
+              </Grid>
+              <Grid item xs>
                 <PostSharer postId={postId} name={orgAuthorName} />
               </Grid>
             </Grid>
+
+            {commentsOpen &&
+              <Comments postId={postId} myUid={myUid} />
+            }
 
           </Grid>
         </CardActions>
