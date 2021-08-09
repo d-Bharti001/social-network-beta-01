@@ -27,7 +27,7 @@ function PostsList() {
   }, [])
 
   return (
-    <div className='PostsList' style={{ marginBottom: '40px' }}>
+    <div className='PostsList' style={{ marginBottom: '90px' }}>
       <Container maxWidth='xs'>
         {loadingInitials ?
           <div style={{ textAlign: 'center' }}>
