@@ -38,13 +38,18 @@ export function DatabaseProvider({ children }) {
     var profileData = Object.assign({}, profiles[userId])
     Object.assign(profileData, userDetails)
     var profileObj = {}
-    profileObj[userId] = profileData
+    profileObj[userId] = { ...profileData, userId: userId }
     setProfiles(prevProfiles => ({ ...prevProfiles, ...profileObj }))
   }
 
   const loadProfile = async (userId) => {
     try {
       var userData = (await db.collection('users').doc(userId).get()).data()
+
+      if (!userData) {
+        console.log('User data not available')
+        return
+      }
     }
     catch (err) {
       console.log('Error loading profile details of user id:', userId)
@@ -52,7 +57,7 @@ export function DatabaseProvider({ children }) {
     }
 
     var newUserObj = {}
-    newUserObj[userId] = userData
+    newUserObj[userId] = { ...userData, userId: userId }
     setProfiles(prevProfiles => ({ ...prevProfiles, ...newUserObj }))
   }
 
