@@ -11,6 +11,7 @@ import {
 import { blue, red } from '@material-ui/core/colors'
 import Identicon from 'identicon.js'
 import { useStyles } from '../styles'
+import { getLocalDateTime } from '../utils'
 import { useDatabase } from '../DatabaseContext'
 import PostSharer from './PostSharer'
 import Comments from './Comments'
@@ -99,6 +100,11 @@ function PostCard({ postId, myUid }) {
                 {creatorName}
               </Link>
             </>
+          }
+          subheader={
+            <Typography variant='caption' color='textSecondary'>
+              {getLocalDateTime(thisPost.createdAt)}
+            </Typography>
           }
           action={
             <>

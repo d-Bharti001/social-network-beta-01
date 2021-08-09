@@ -6,6 +6,7 @@ import {
 import { Refresh, Send } from '@material-ui/icons'
 import Identicon from 'identicon.js'
 import { useStyles } from '../styles'
+import { getLocalDateTime } from '../utils'
 import { useDatabase } from '../DatabaseContext'
 
 function Comments({ postId, myUid }) {
@@ -127,6 +128,11 @@ function Comments({ postId, myUid }) {
                     <Link component={RouterLink} to={`/user/${commentObj.commenter}`}>
                       {profiles[commentObj.commenter].name}
                     </Link>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant='caption' color='textSecondary'>
+                      {getLocalDateTime(commentObj.timestamp)}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant='body2' className={classes.paragraph}>
