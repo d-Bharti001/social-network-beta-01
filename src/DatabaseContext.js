@@ -299,6 +299,11 @@ export function DatabaseProvider({ children }) {
       var postRef = db.collection('posts').doc(postId)
       var docData = postData || (await postRef.get()).data()
 
+      if (!docData) {
+        console.log('Post doesn\'t exist')
+        return
+      }
+
       // IMPORTANT: Load original post first before loading current post data
       if (docData.type === 'shared' && !posts[docData.orgPostId])
         await loadPost(docData.orgPostId)
