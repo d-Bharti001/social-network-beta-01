@@ -28,6 +28,8 @@ function PostSharer({ postId, name }) {
   }
 
   const handleClose = () => {
+    if(loading)
+      return
     setLoading(false)
     setError('')
     setOpen(false)
@@ -76,7 +78,7 @@ function PostSharer({ postId, name }) {
           }
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color='primary'>
+          <Button onClick={handleClose} color='primary' disabled={loading}>
             Cancel
           </Button>
           <Button onClick={handleConfirm} color='primary' disabled={loading}>
@@ -87,7 +89,7 @@ function PostSharer({ postId, name }) {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={handleSnackbarClose}
         message='Post shared successfully'
         className={classes.snackbar}
