@@ -42,6 +42,15 @@ export const useStyles = makeStyles((theme) => ({
   form: {
     margin: theme.spacing(4, 2),
   },
+  fileInput: {
+    display: 'none',
+  },
+  postCreateImageList: {
+    height: 180,
+    border: '1px solid #ccc',
+    borderRadius: theme.spacing(1),
+    padding: theme.spacing(1),
+  },
   submitButton: {
     margin: theme.spacing(2, 'auto', 4),
   },

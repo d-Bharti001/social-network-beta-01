@@ -61,12 +61,13 @@ export function DatabaseProvider({ children }) {
     setProfiles(prevProfiles => ({ ...prevProfiles, ...newUserObj }))
   }
 
-  const createPost = async (postContent) => {
+  const createPost = async (postContent, attachmentsArray) => {
     try {
       var newPostRef = db.collection('posts').doc()
       var newPostData = {
         type: 'original',
         content: postContent,
+        attachments: attachmentsArray,
         createdAt: Timestamp.now(),
         creator: currentUser.uid,
         postId: newPostRef.id,
