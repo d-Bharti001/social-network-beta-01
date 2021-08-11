@@ -190,39 +190,29 @@ export function DatabaseProvider({ children }) {
     setPosts(prevPosts => ({ ...prevPosts, ...postObj }))
   }
 
-  const toggleFlagPost = async (postId) => {
+  const toggleFlagPost = async (postId, action) => {
     var post = posts[postId]
     var orgPostId = post.orgPostId
     var currentPostId = post.postId
 
     try {
-      var eventsRef = db.collection('posts').doc(orgPostId).collection('events')
+      var eventType
 
-      // Get the list of flags of original post by current user
-      var { docs } = await eventsRef.where('type', '==', 'flagged').where('flagger', '==', currentUser.uid).get()
+      if (action === 'flag')
+        eventType = 'flagged'
+      else if (action === 'unflag')
+        eventType = 'unflagged'
+      else
+        return
 
-      var action
-
-      if (docs.length > 0) {  // User had flagged the post earlier
-        // Delete flag events by current user from firestore
-        for (let i = 0; i < docs.length; i++) {
-          await eventsRef.doc(docs[i].id).delete()
-        }
-
-        action = 'delete'
-      }
-      else {
-        // Add a flag event to firestore
-        await eventsRef.add({
-          type: 'flagged',
-          orgPostId: orgPostId,
-          throughPostId: currentPostId,
-          flagger: currentUser.uid,
-          timestamp: Timestamp.now()
-        })
-
-        action = 'add'
-      }
+      // Add a flag event to firestore
+      await db.collection('posts').doc(orgPostId).collection('events').add({
+        type: eventType,
+        orgPostId: orgPostId,
+        throughPostId: currentPostId,
+        flagger: currentUser.uid,
+        timestamp: Timestamp.now()
+      })
     }
     catch (err) {
       console.log('Error toggling flag for the post', err.name, err.message)
@@ -232,8 +222,8 @@ export function DatabaseProvider({ children }) {
     // Update flaggers set of original post in the posts state variable
     var postObj = {}
     postObj[orgPostId] = Object.assign({}, posts[orgPostId])
-    if (action === 'add') postObj[orgPostId].flaggers.add(currentUser.uid)
-    else if (action === 'delete') postObj[orgPostId].flaggers.delete(currentUser.uid)
+    if (action === 'flag') postObj[orgPostId].flaggers.add(currentUser.uid)
+    else if (action === 'unflag') postObj[orgPostId].flaggers.delete(currentUser.uid)
     setPosts(prevPosts => ({ ...prevPosts, ...postObj }))
   }
 
@@ -340,8 +330,16 @@ export function DatabaseProvider({ children }) {
 
     if (docData.type === 'original') {
       newPostObj[postId].viewers = new Set(events.filter(a => a.data().type === 'viewed').map(a => a.data().viewer))
-      newPostObj[postId].flaggers = new Set(events.filter(a => a.data().type === 'flagged').map(a => a.data().flagger))
+
       newPostObj[postId].sharers = new Set(events.filter(a => a.data().type === 'shared').map(a => a.data().sharer))
+
+      var flaggersObj = new Set()
+      events.filter(a => /flag/.test(a.data().type)).sort((a,b) => a.data().timestamp - b.data().timestamp)
+        .forEach(a => {
+          if (a.data().type === 'flagged') flaggersObj.add(a.data().flagger)
+          else if (a.data().type === 'unflagged') flaggersObj.delete(a.data().flagger)
+        })
+      newPostObj[postId].flaggers = flaggersObj
     }
 
     // Add to the posts state variable

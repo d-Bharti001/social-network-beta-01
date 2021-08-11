@@ -35,11 +35,19 @@ function PostCard({ postId, myUid }) {
 
   const [expanded, setExpanded] = useState(false)
   const [hasRead, setHasRead] = useState(false)
+  const [flagging, setFlagging] = useState(false)
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleFlag = () => {
-    toggleFlagPost(postId).catch(err => console.log(err.name, err.message))
+    setFlagging(true)
+    var action = flaggedByMe ? 'unflag' : 'flag'
+    toggleFlagPost(postId, action)
+      .then(_ => setFlagging(false))
+      .catch(err => {
+        console.log(err.name, err.message)
+        setFlagging(false)
+      })
   }
 
   const handleExpand = () => {
@@ -223,7 +231,7 @@ function PostCard({ postId, myUid }) {
 
             <Grid container item xs={12} style={{ borderTop: '1px solid #ccc' }}>
               <Grid item xs>
-                <Button onClick={handleFlag} fullWidth size='small' style={{ textTransform: 'none' }}>
+                <Button disabled={flagging} onClick={handleFlag} fullWidth size='small' style={{ textTransform: 'none' }}>
                   {flaggedByMe ?
                     <>
                       <FlagRounded fontSize='small' style={{ color: red[500] }} className={classes.postCardIcon} />
