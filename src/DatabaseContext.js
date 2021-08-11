@@ -350,16 +350,13 @@ export function DatabaseProvider({ children }) {
 
   const loadPosts = async () => {
     if (loadingMorePosts.current === true) {
-      console.log('currently loading posts. can\'t load more')
       return
     }
     if (noMorePosts.current === true) {
-      console.log('No more posts')
       return
     }
 
     try {
-      console.log('Loading more posts')
 
       loadingMorePosts.current = true
 
@@ -404,11 +401,7 @@ export function DatabaseProvider({ children }) {
       setLoadingInitials(false)
     }
 
-    console.log('Trying to load')
     if (currentUserDataExists) {
-      console.log('Loading initials...')
-
-      // Load the required initials
       loadInitials()
     }
     else {
