@@ -51,6 +51,9 @@ export const useStyles = makeStyles((theme) => ({
     borderRadius: theme.spacing(1),
     padding: theme.spacing(1),
   },
+  postCardImageList: {
+    height: 190,
+  },
   submitButton: {
     margin: theme.spacing(2, 'auto', 4),
   },

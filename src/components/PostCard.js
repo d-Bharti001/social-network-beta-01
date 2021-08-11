@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import {
   Button, Card, CardActions, CardContent, CardHeader,
-  Grid, IconButton, Link, Menu, MenuItem, Typography
+  Grid, ImageList, ImageListItem, IconButton, Link, Menu, MenuItem, Typography
 } from '@material-ui/core'
 import {
   MoreVert, FlagRounded, OutlinedFlagRounded, ShareOutlined,
@@ -24,6 +24,7 @@ function PostCard({ postId, myUid }) {
   const thisPost = posts[postId]
   const refPost = thisPost.type === 'original' ? thisPost : posts[thisPost.orgPostId]
   const content = refPost.content
+  const attachments = refPost.attachments
   const numShares = refPost.sharers.size
   const numViews = refPost.viewers.size
   const numFlags = refPost.flaggers.size
@@ -147,7 +148,7 @@ function PostCard({ postId, myUid }) {
             </Typography>
           }
 
-          <Typography variant='body2' className={classes.paragraph}>
+          <Typography variant='body2' className={classes.paragraph} paragraph>
             {expanded ?
               <>
                 {content + ' '}
@@ -171,6 +172,24 @@ function PostCard({ postId, myUid }) {
               </>
             }
           </Typography>
+
+          {expanded && attachments.length ?
+            <>
+              <ImageList rowHeight={180} className={classes.postCardImageList}>
+                {attachments.map(a => (
+                  <ImageListItem key={a.url} component={Link}
+                    href={a.url} target='_blank'
+                  >
+                    <img src={a.url} />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+              <Typography variant='caption' color='textSecondary'>
+                Click on an image to open it in new tab
+              </Typography>
+            </> :
+            <></>
+          }
 
         </CardContent>
 
