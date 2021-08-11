@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import {
-  Button, CircularProgress, Grid, IconButton, Link, TextField, Tooltip, Typography
+  CircularProgress, Grid, IconButton, Link, TextField, Tooltip, Typography
 } from '@material-ui/core'
 import { Refresh, Send } from '@material-ui/icons'
 import Identicon from 'identicon.js'
@@ -49,6 +49,8 @@ function Comments({ postId, myUid }) {
     // Load comments if not already loaded
     if (!postComments[postId])
       handleLoadComments()
+
+    // eslint-disable-next-line
   }, [])
 
   return (

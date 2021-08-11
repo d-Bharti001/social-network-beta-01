@@ -414,6 +414,8 @@ export function DatabaseProvider({ children }) {
       noMorePosts.current = false
       loadingMorePosts.current = false
     }
+
+    // eslint-disable-next-line
   }, [currentUserDataExists])
 
   return (

@@ -28,6 +28,8 @@ function PostPage(props) {
           setLoading(false)
         })
     }
+
+    // eslint-disable-next-line
   }, [])
 
   return (

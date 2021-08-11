@@ -26,6 +26,8 @@ function UserPage(props) {
           setLoading(false)
         })
     }
+
+    // eslint-disable-next-line
   }, [])
 
   return (

@@ -180,7 +180,7 @@ function PostCard({ postId, myUid }) {
                   <ImageListItem key={a.url} component={Link}
                     href={a.url} target='_blank'
                   >
-                    <img src={a.url} />
+                    <img src={a.url} alt='' />
                   </ImageListItem>
                 ))}
               </ImageList>

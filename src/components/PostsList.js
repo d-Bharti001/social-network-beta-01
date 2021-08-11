@@ -24,6 +24,8 @@ function PostsList() {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
     return _ => window.removeEventListener('scroll', handleScroll)
+
+    // eslint-disable-next-line
   }, [])
 
   return (
