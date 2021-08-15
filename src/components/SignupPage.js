@@ -26,8 +26,7 @@ function SignupPage() {
       return
     }
     try {
-      let res = await signup(email.current.value, password.current.value)
-      console.log(res)
+      await signup(email.current.value, password.current.value)
     }
     catch (err) {
       console.log('Error')

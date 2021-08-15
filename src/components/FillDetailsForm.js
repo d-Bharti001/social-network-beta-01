@@ -45,7 +45,8 @@ function FillDetailsForm() {
         name: name.current.value,
         bio: bio.current.value,
         gender: gender,
-        birthYear: Number(birthYear)
+        birthYear: Number(birthYear),
+        friends: [] // friends list
       }
 
       // Upload profile details to database
