@@ -19,7 +19,7 @@ function SignupPage() {
     event.preventDefault()
     setLoading(true)
     setError('')
-    console.log(email.current.value, password.current.value, passwordConf.current.value)
+
     if (password.current.value !== passwordConf.current.value) {
       setError('Passwords don\'t match')
       setLoading(false)
